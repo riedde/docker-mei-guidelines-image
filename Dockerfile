@@ -12,6 +12,7 @@ ARG PRINCE_VERSION=15.1
 ARG SAXON_VERSION=SaxonHE11-5
 ARG TARGETARCH
 ARG UBUNTU_VERSION=22.04
+ARG VEROVIO_VERSION=3.15.0
 ARG XERCES_VERSION=25.1.0.1
 ARG DEB_FILE=prince_${PRINCE_VERSION}-1_ubuntu${UBUNTU_VERSION}_${TARGETARCH}.deb
 
@@ -31,7 +32,7 @@ RUN apt-get update && \
     wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc && \
     echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 # install packages
-RUN apt-get update && apt-get install -y --no-install-recommends apt-utils temurin-${JAVA_VERSION}-jdk curl unzip git libc6 aptitude libaom-dev gdebi fonts-stix && \
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils temurin-${JAVA_VERSION}-jdk curl unzip git python3-pip libc6 aptitude libaom-dev gdebi fonts-stix && \
     # install prince
     curl --proto '=https' --tlsv1.2 -O https://www.princexml.com/download/${DEB_FILE} && \
     gdebi --non-interactive ./${DEB_FILE} && \
@@ -52,6 +53,10 @@ RUN unzip /tmp/saxon.zip -d ${ANT_HOME}/lib
 
 # setup xerces
 ADD https://www.oxygenxml.com/maven/com/oxygenxml/oxygen-patched-xerces/${XERCES_VERSION}/oxygen-patched-xerces-${XERCES_VERSION}.jar ${ANT_HOME}/lib
+
+# setup verovio via python
+RUN pip3 install --upgrade pip && \
+    pip3 install verovio==${VEROVIO_VERSION}
 
 # cleanup
 RUN apt-get purge -y aptitude apt-utils gdebi curl unzip wget apt-transport-https && \
