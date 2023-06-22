@@ -32,7 +32,7 @@ RUN apt-get update && \
     wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc && \
     echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 # install packages
-RUN apt-get update && apt-get install -y --no-install-recommends apt-utils temurin-${JAVA_VERSION}-jdk curl unzip git python3-pip libc6 aptitude libaom-dev gdebi fonts-stix && \
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils temurin-${JAVA_VERSION}-jdk curl unzip git python3-pip swig libc6 aptitude libaom-dev gdebi fonts-stix && \
     # install prince
     curl --proto '=https' --tlsv1.2 -O https://www.princexml.com/download/${DEB_FILE} && \
     gdebi --non-interactive ./${DEB_FILE} && \
