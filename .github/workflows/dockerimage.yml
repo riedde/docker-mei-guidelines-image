@@ -10,6 +10,9 @@ on:
     paths-ignore:
       - '**.md' # ignore changes in markdown files
 
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
