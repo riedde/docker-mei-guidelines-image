@@ -46,7 +46,7 @@ jobs:
 
       - name: MAIN – Build and push
         if: ${{ github.event_name == 'push' }}
-        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5.3.0
+        uses: docker/build-push-action@31159d49c0d4756269a0940a750801a1ea5d7003 # v6.1.0
         with:
           context: .
           file: Dockerfile
@@ -56,7 +56,7 @@ jobs:
 
       - name: PR – build only
         if: ${{ github.event_name == 'pull_request' }}
-        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5.3.0
+        uses: docker/build-push-action@31159d49c0d4756269a0940a750801a1ea5d7003 # v6.1.0
         with:
           context: .
           file: Dockerfile
