@@ -11,6 +11,7 @@ ARG JAVA_VERSION=17
 ARG PRINCE_VERSION=15.3
 ARG TARGETARCH
 ARG SAXON_VERSION=SaxonHE12-5
+ARG SCHEMATRON_VERSION=8.0.0
 ARG UBUNTU_VERSION=22.04
 ARG XERCES_VERSION=26.1.0.1
 ARG DEB_FILE=prince_${PRINCE_VERSION}-1_ubuntu${UBUNTU_VERSION}_${TARGETARCH}.deb
@@ -27,6 +28,7 @@ USER root
 ADD https://downloads.apache.org/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz \
     https://github.com/Saxonica/Saxon-HE/releases/download/${SAXON_VERSION}/${SAXON_VERSION}J.zip \
     https://www.oxygenxml.com/maven/com/oxygenxml/oxygen-patched-xerces/${XERCES_VERSION}/oxygen-patched-xerces-${XERCES_VERSION}.jar \
+    https://repo1.maven.org/maven2/com/helger/schematron/ph-schematron-ant-task/${SCHEMATRON_VERSION}/ph-schematron-ant-task-${SCHEMATRON_VERSION}-jar-with-dependencies.jar \
     /tmp/
 
 COPY ["index.js", "package.json", "package-lock.json*", "/opt/docker-mei/"]
@@ -51,6 +53,8 @@ RUN apt-get update && apt-get full-upgrade -y && \
     unzip /tmp/${SAXON_VERSION}J.zip -d ${ANT_HOME}/lib && \
     # setup xerces
     cp /tmp/oxygen-patched-xerces-${XERCES_VERSION}.jar ${ANT_HOME}/lib && \
+    # setup schematron
+    cp /tmp/ph-schematron-ant-task-${SCHEMATRON_VERSION}-jar-with-dependencies.jar ${ANT_HOME}/lib && \
     # cleanup
     apt-get purge -y aptitude apt-utils && \
     apt-get autoremove -y && apt-get clean && \
