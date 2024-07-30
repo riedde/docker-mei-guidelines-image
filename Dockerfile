@@ -6,14 +6,15 @@ LABEL org.opencontainers.image.authors="https://github.com/kepper"
 LABEL org.opencontainers.image.source="https://github.com/music-encoding/docker-mei"
 LABEL org.opencontainers.image.revision="v0.0.1"
 
-ARG DEBIAN_FRONTEND=noninteractive
 ARG JAVA_VERSION=17
 ARG PRINCE_VERSION=15.3
-ARG TARGETARCH
 ARG SAXON_VERSION=SaxonHE12-5
 ARG SCHEMATRON_VERSION=8.0.0
 ARG UBUNTU_VERSION=22.04
 ARG XERCES_VERSION=26.1.0.1
+
+ARG TARGETARCH
+ARG DEBIAN_FRONTEND=noninteractive
 ARG DEB_FILE=prince_${PRINCE_VERSION}-1_ubuntu${UBUNTU_VERSION}_${TARGETARCH}.deb
 
 ENV TZ=Europe/Berlin
