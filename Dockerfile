@@ -17,7 +17,9 @@ ARG SAXON_EDITION_VERSION=SaxonHE12-5
 ARG SCHEMATRON_VERSION=8.0.0
 ARG UBUNTU_VERSION=24.04
 ARG XERCES_VERSION=26.1.0.1
+
 ARG TARGETARCH
+ARG PRINCE_DEB_FILE=prince_${PRINCE_VERSION}-1_ubuntu${UBUNTU_VERSION}_${TARGETARCH}.deb
 
 ENV TZ=Europe/Berlin
 
@@ -28,7 +30,12 @@ RUN echo 'APT::Install-Recommends "0";' >> /etc/apt/apt.conf.d/00-docker
 RUN DEBIAN_FRONTEND=noninteractive \
     # update and install common dependencies
     apt-get update && apt-get full-upgrade -y && \
-    apt-get install -y --no-install-recommends apt-utils ca-certificates curl unzip
+    apt-get install -y --no-install-recommends apt-utils ca-certificates curl unzip && \
+    # install prince
+    curl --proto '=https' --tlsv1.2 -LO https://www.princexml.com/download/${PRINCE_DEB_FILE} && \
+    apt-get install -y --no-install-recommends libc6 libaom-dev fonts-stix ./${PRINCE_DEB_FILE} && \
+    # link ca-certificates
+    ln -sf /etc/ssl/certs/ca-certificates.crt /usr/lib/prince/etc/curl-ca-bundle.crt
 
 
 ################
@@ -59,23 +66,8 @@ RUN DEBIAN_FRONTEND=noninteractive \
     npm install --omit=dev
 
 
-###################
-# Stage 4: PRINCE #
-###################
-FROM base AS prince-build
-
-ARG PRINCE_DEB_FILE=prince_${PRINCE_VERSION}-1_ubuntu${UBUNTU_VERSION}_${TARGETARCH}.deb
-
-RUN DEBIAN_FRONTEND=noninteractive \
-    # install prince
-    curl --proto '=https' --tlsv1.2 -LO https://www.princexml.com/download/${PRINCE_DEB_FILE} && \
-    apt-get install -y --no-install-recommends libc6 libaom-dev fonts-stix ./${PRINCE_DEB_FILE} && \
-    # link ca-certificates
-    ln -sf /etc/ssl/certs/ca-certificates.crt /usr/lib/prince/etc/curl-ca-bundle.crt
-
-
 ################
-# Stage 5: ANT #
+# Stage 4: ANT #
 ################
 FROM base AS ant-build
 
@@ -102,7 +94,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 ####################
 # Stage 6: Runtime #
 ####################
-FROM ubuntu:24.10
+FROM base AS runtime
 
 LABEL org.opencontainers.image.authors="https://github.com/riedde" \
       org.opencontainers.image.authors="https://github.com/bwbohl" \
@@ -125,13 +117,9 @@ COPY --from=git-build /usr/share/git-core /usr/share/git-core
 # Node
 COPY --from=node-build /usr/bin/node /usr/bin/node
 COPY --from=node-build /usr/lib/node_modules /usr/lib/node_modules
+
+# Main directory
 COPY --from=node-build /opt/docker-mei /opt/docker-mei
-# Prince
-COPY --from=prince-build /usr/bin/prince /usr/bin/prince
-COPY --from=prince-build /usr/lib/prince /usr/lib/prince
-COPY --from=prince-build /etc/fonts /etc/fonts
-COPY --from=prince-build /usr/share/fonts /usr/share/fonts
-COPY --from=prince-build /usr/lib/x86_64-linux-gnu/lib* /usr/lib/x86_64-linux-gnu/
 
 # Set path
 ENV PATH=${PATH}:${ANT_HOME}/bin:${JAVA_HOME}/bin:/usr/local/bin
