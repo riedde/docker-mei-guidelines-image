@@ -81,7 +81,6 @@ For example, if you start the Docker image from the root folder of your music-en
 docker run --rm -it -v `pwd`:/opt/docker-mei/music-encoding --name docker-mei ghcr.io/music-encoding/docker-mei:latest
 ```
 
-
 > [!TIP] 
 > See [Using `pwd` on Different Operating Systems](#using-pwd-on-different-operating-systems) above for different alternatives for `` `pwd` `` when using non-Unix like operating systems.
 
